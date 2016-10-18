@@ -1,7 +1,8 @@
 TelegramHandler
 ===============
 
-
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/d7f41933-3e48-4c2d-befc-35aba76bf0ef/mini.png)](https://insight.sensiolabs.com/projects/d7f41933-3e48-4c2d-befc-35aba76bf0ef)
+[![Build Status](https://travis-ci.org/merorafael/telegram-handler.svg?branch=master)](https://travis-ci.org/merorafael/telegram-handler)
 [![Latest Stable Version](https://poser.pugx.org/mero/telegram-handler/v/stable.svg)](https://packagist.org/packages/mero/telegram-handler) 
 [![Total Downloads](https://poser.pugx.org/mero/telegram-handler/downloads.svg)](https://packagist.org/packages/mero/telegram-handler) 
 [![License](https://poser.pugx.org/mero/telegram-handler/license.svg)](https://packagist.org/packages/mero/telegram-handler)
