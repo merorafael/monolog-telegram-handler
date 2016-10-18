@@ -13,7 +13,6 @@ Requirements
 ------------
 
 - PHP 5.4 or above
-- Yii 2.0.0 or above
 
 Instalation with composer
 -------------------------
