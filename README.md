@@ -3,16 +3,17 @@ TelegramHandler
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/d7f41933-3e48-4c2d-befc-35aba76bf0ef/mini.png)](https://insight.sensiolabs.com/projects/d7f41933-3e48-4c2d-befc-35aba76bf0ef)
 [![Build Status](https://travis-ci.org/merorafael/telegram-handler.svg?branch=master)](https://travis-ci.org/merorafael/telegram-handler)
+[![Coverage Status](https://coveralls.io/repos/github/merorafael/telegram-handler/badge.svg?branch=master)](https://coveralls.io/github/merorafael/telegram-handler?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/mero/telegram-handler/v/stable.svg)](https://packagist.org/packages/mero/telegram-handler) 
 [![Total Downloads](https://poser.pugx.org/mero/telegram-handler/downloads.svg)](https://packagist.org/packages/mero/telegram-handler) 
 [![License](https://poser.pugx.org/mero/telegram-handler/license.svg)](https://packagist.org/packages/mero/telegram-handler)
 
-Monolog handler to send log by Telegram. **[This project is in the approval stage to be implemented officially in Monolog](https://github.com/Seldaek/monolog/pull/869)**.
+Monolog handler to send log by Telegram.
 
 Requirements
 ------------
 
-- PHP 5.4 or above
+- PHP 5.6 or above
 
 Instalation with composer
 -------------------------

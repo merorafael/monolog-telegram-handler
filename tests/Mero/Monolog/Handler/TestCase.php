@@ -12,8 +12,9 @@
 namespace Mero\Monolog\Handler;
 
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends PHPUnitTestCase
 {
     /**
      * @return array Record
@@ -50,7 +51,9 @@ class TestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getIdentityFormatter()
     {
-        $formatter = $this->getMock('Monolog\\Formatter\\FormatterInterface');
+        $formatter = $this
+            ->getMockBuilder('Monolog\\Formatter\\FormatterInterface')
+            ->getMock();
         $formatter->expects($this->any())
             ->method('format')
             ->will($this->returnCallback(function ($record) {
