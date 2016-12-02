@@ -90,7 +90,7 @@ Give a chat identifier
 To retrieve the chat_id in which the log will be sent, the recipient user will first need a conversation with 
 the bot. After the conversation has started, make the request below to know the chat_id of that conversation.
 
-**URL:** https://api.telegram.org/bot<token>/getUpdates
+**URL:** https://api.telegram.org/bot_token_/getUpdates
 
 **Example:**
 
