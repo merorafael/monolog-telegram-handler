@@ -20,6 +20,7 @@
     }
   ],
   "require": {
+    "ext-curl": "*",
     "monolog/monolog": "^1.20"
   },
   "require-dev": {

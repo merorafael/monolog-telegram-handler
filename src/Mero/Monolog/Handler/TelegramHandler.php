@@ -2,8 +2,9 @@
 
 namespace Mero\Monolog\Handler;
 
+use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\MissingExtensionException;
-use Monolog\Handler\SocketHandler;
+use Monolog\Handler\Curl;
 use Monolog\Logger;
 
 /**
@@ -13,7 +14,7 @@ use Monolog\Logger;
  *
  * @see    https://core.telegram.org/bots/api
  */
-class TelegramHandler extends SocketHandler
+class TelegramHandler extends AbstractProcessingHandler
 {
     /**
      * @var string Telegram API token
@@ -31,68 +32,18 @@ class TelegramHandler extends SocketHandler
      * @param int    $level  The minimum logging level at which this handler will be triggered
      * @param bool   $bubble Whether the messages that are handled can bubble up the stack or not
      *
-     * @throws MissingExtensionException If no OpenSSL PHP extension configured
+     * @throws MissingExtensionException If the PHP cURL extension is not loaded
      */
     public function __construct($token, $chatId, $level = Logger::CRITICAL, $bubble = true)
     {
-        if (!extension_loaded('openssl')) {
-            throw new MissingExtensionException('The OpenSSL PHP extension is required to use the TelegramHandler');
+        if (!extension_loaded('curl')) {
+            throw new MissingExtensionException('The cURL PHP extension is required to use the TelegramHandler');
         }
-
-        parent::__construct('ssl://api.telegram.org:443', $level, $bubble);
 
         $this->token = $token;
         $this->chatId = $chatId;
-    }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $record
-     *
-     * @return string
-     */
-    protected function generateDataStream($record)
-    {
-        $content = $this->buildContent($record);
-
-        return $this->buildHeader($content).$content;
-    }
-
-    /**
-     * Builds the body of API call.
-     *
-     * @param array $record
-     *
-     * @return string
-     */
-    private function buildContent($record)
-    {
-        $dataArray = [
-            'chat_id' => $this->chatId,
-            'text' => $record['formatted'],
-        ];
-
-        return json_encode($dataArray);
-    }
-
-    /**
-     * Builds the header of the API Call.
-     *
-     * @param string $content
-     *
-     * @return string
-     */
-    private function buildHeader($content)
-    {
-        $header = "POST /bot{$this->token}/sendMessage HTTP/1.1\r\n";
-
-        $header .= "Host: api.telegram.org\r\n";
-        $header .= "Content-Type: application/json\r\n";
-        $header .= 'Content-Length: '.strlen($content)."\r\n";
-        $header .= "\r\n";
-
-        return $header;
+        parent::__construct($level, $bubble);
     }
 
     /**
@@ -102,7 +53,27 @@ class TelegramHandler extends SocketHandler
      */
     protected function write(array $record)
     {
-        parent::write($record);
-        $this->closeSocket();
+        $postData = json_encode([
+            'chat_id' => $this->chatId,
+            'text' => $record['formatted'],
+        ]);
+
+        $telegramUrl = sprintf(
+            'https://api.telegram.org/bot%s/sendMessage',
+            $this->token
+        );
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: '.strlen($postData)
+        ]);
+        curl_setopt($ch, CURLOPT_URL, $telegramUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+        Curl\Util::execute($ch);
     }
 }

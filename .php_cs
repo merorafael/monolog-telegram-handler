@@ -1,11 +1,14 @@
 <?php
-$finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->in(__DIR__)
+
+$finder = PhpCsFixer\Finder::create()
     ->exclude('vendor')
+    ->in(__DIR__)
 ;
 
-return Symfony\CS\Config\Config::create()
-    ->fixers(array('-symfony'))
-    ->finder($finder)
-    ->setUsingCache(true)
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@PSR2' => true,
+        'array_syntax' => ['syntax' => 'short'],
+    ])
+    ->setFinder($finder)
 ;

@@ -14,6 +14,7 @@ Requirements
 ------------
 
 - PHP 5.6 or above
+- cURL extension
 
 Instalation with composer
 -------------------------
