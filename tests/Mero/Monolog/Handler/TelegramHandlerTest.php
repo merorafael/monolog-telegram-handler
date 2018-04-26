@@ -2,6 +2,8 @@
 
 namespace Mero\Monolog\Handler;
 
+use Mero\Monolog\Formatter\HtmlFormatter;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
 
 /**
@@ -23,54 +25,52 @@ class TelegramHandlerTest extends TestCase
 
     public function setUp()
     {
-        if (!extension_loaded('openssl')) {
-            $this->markTestSkipped('This test requires openssl to run');
+        if (!extension_loaded('curl')) {
+            $this->markTestSkipped('This test requires curl to run');
         }
+        $this->handler = new TelegramHandler('myToken', 'myChat', Logger::DEBUG, true);
+    }
+
+    public function testCreateHandler()
+    {
+        $this->assertInstanceOf(TelegramHandler::class, $this->handler);
     }
 
     public function testWriteHeader()
     {
-        $this->createHandler();
-        $this->handler->handle($this->getRecord(Logger::CRITICAL, 'test1'));
-        fseek($this->res, 0);
-        $content = fread($this->res, 1024);
+        $class = new \ReflectionClass(TelegramHandler::class);
+        $method = $class->getMethod('buildHeader');
+        $method->setAccessible(true);
 
-        $this->assertRegexp('{POST /botmyToken/sendMessage HTTP/1.1\\r\\nHost: api.telegram.org\\r\\nContent-Type: application/json\\r\\nContent-Length: 35\\r\\n\\r\\n}', $content);
+        $header = $method->invoke($this->handler, 'test');
+
+        $this->assertContains('Content-Type: application/json', $header);
+        $this->assertContains('Content-Length: 4', $header);
     }
 
     public function testWriteContent()
     {
-        $this->createHandler();
-        $this->handler->handle($this->getRecord(Logger::CRITICAL, 'test1'));
-        fseek($this->res, 0);
-        $content = fread($this->res, 1024);
+        $this->handler->setFormatter($this->getIdentityFormatter());
+
+        $class = new \ReflectionClass(TelegramHandler::class);
+        $method = $class->getMethod('buildContent');
+        $method->setAccessible(true);
+
+        $content = $method->invoke($this->handler, ['formatted' => 'test1']);
 
         $this->assertRegexp('/{"chat_id":"myChat","text":"test1"}$/', $content);
     }
 
-    private function createHandler($token = 'myToken', $chatId = 'myChat')
+    public function testWriteContentWithTelegramFormatter()
     {
-        $constructorArgs = [$token, $chatId, Logger::DEBUG, true];
-        $this->res = fopen('php://memory', 'a');
-        $this->handler = $this->getMockBuilder('Mero\Monolog\Handler\TelegramHandler')
-            ->setConstructorArgs($constructorArgs)
-            ->setMethods(['fsockopen', 'streamSetTimeout', 'closeSocket'])
-            ->getMock();
+        $this->handler->setFormatter(new HtmlFormatter());
 
-        $reflectionProperty = new \ReflectionProperty('Monolog\Handler\SocketHandler', 'connectionString');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->handler, 'localhost:1234');
+        $class = new \ReflectionClass(TelegramHandler::class);
+        $method = $class->getMethod('buildContent');
+        $method->setAccessible(true);
 
-        $this->handler->expects($this->any())
-            ->method('fsockopen')
-            ->will($this->returnValue($this->res));
-        $this->handler->expects($this->any())
-            ->method('streamSetTimeout')
-            ->will($this->returnValue(true));
-        $this->handler->expects($this->any())
-            ->method('closeSocket')
-            ->will($this->returnValue(true));
+        $content = $method->invoke($this->handler, ['formatted' => 'test1']);
 
-        $this->handler->setFormatter($this->getIdentityFormatter());
+        $this->assertRegexp('/{"chat_id":"myChat","text":"test1","parse_mode":"HTML"}$/', $content);
     }
 }

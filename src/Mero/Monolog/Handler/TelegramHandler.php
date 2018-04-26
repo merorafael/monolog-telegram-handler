@@ -2,6 +2,7 @@
 
 namespace Mero\Monolog\Handler;
 
+use Mero\Monolog\Formatter\HtmlFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\MissingExtensionException;
 use Monolog\Handler\Curl;
@@ -34,8 +35,12 @@ class TelegramHandler extends AbstractProcessingHandler
      *
      * @throws MissingExtensionException If the PHP cURL extension is not loaded
      */
-    public function __construct($token, $chatId, $level = Logger::CRITICAL, $bubble = true)
-    {
+    public function __construct(
+        $token,
+        $chatId,
+        $level = Logger::CRITICAL,
+        $bubble = true
+    ) {
         if (!extension_loaded('curl')) {
             throw new MissingExtensionException('The cURL PHP extension is required to use the TelegramHandler');
         }
@@ -47,32 +52,57 @@ class TelegramHandler extends AbstractProcessingHandler
     }
 
     /**
+     * Builds the header of the API Call.
+     *
+     * @param string $content
+     *
+     * @return array
+     */
+    protected function buildHeader($content)
+    {
+        return [
+            'Content-Type: application/json',
+            'Content-Length: '.strlen($content),
+        ];
+    }
+
+    /**
+     * Builds the body of API call.
+     *
+     * @param array $record
+     *
+     * @return string
+     */
+    protected function buildContent(array $record)
+    {
+        $content = [
+            'chat_id' => $this->chatId,
+            'text' => $record['formatted'],
+        ];
+
+        if ($this->formatter instanceof HtmlFormatter) {
+            $content['parse_mode'] = 'HTML';
+        }
+
+        return json_encode($content);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param array $record
      */
     protected function write(array $record)
     {
-        $postData = json_encode([
-            'chat_id' => $this->chatId,
-            'text' => $record['formatted'],
-        ]);
-
-        $telegramUrl = sprintf(
-            'https://api.telegram.org/bot%s/sendMessage',
-            $this->token
-        );
+        $content = $this->buildContent($record);
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: '.strlen($postData)
-        ]);
-        curl_setopt($ch, CURLOPT_URL, $telegramUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->buildHeader($content));
+        curl_setopt($ch, CURLOPT_URL, sprintf('https://api.telegram.org/bot%s/sendMessage', $this->token));
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
 
         Curl\Util::execute($ch);
     }

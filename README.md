@@ -46,11 +46,14 @@ $handler = new \Mero\Monolog\Handler\TelegramHandler(
     111111111,
     \Monolog\Logger::DEBUG
 );
-$handler->setFormatter(new \Monolog\Formatter\LineFormatter());
+$handler->setFormatter(new \Mero\Monolog\Formatter\HtmlFormatter());
 $log->pushHandler($handler);
 
 $log->debug('Message log');
 ```
+
+The above example is using HtmlFormatter for Telegram API. This feature is added on 0.3.0 release and 
+you can use declaring handler formatter to use `\Mero\Monolog\Formatter\HtmlFormatter` class.
 
 Creating a bot
 --------------
