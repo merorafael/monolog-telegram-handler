@@ -28,6 +28,11 @@ class TelegramHandler extends AbstractProcessingHandler
     private $chatId;
 
     /**
+     * @var int Request timeout
+     */
+    private $timeout;
+
+    /**
      * @param string $token  Telegram API token
      * @param int    $chatId Chat identifier
      * @param int    $level  The minimum logging level at which this handler will be triggered
@@ -47,8 +52,22 @@ class TelegramHandler extends AbstractProcessingHandler
 
         $this->token = $token;
         $this->chatId = $chatId;
+        $this->timeout = 0;
 
         parent::__construct($level, $bubble);
+    }
+
+    /**
+     * Define a timeout to Telegram send message request.
+     *
+     * @param int $timeout Request timeout
+     *
+     * @return TelegramHandler
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+        return $this;
     }
 
     /**
@@ -103,6 +122,7 @@ class TelegramHandler extends AbstractProcessingHandler
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
 
         Curl\Util::execute($ch);
     }

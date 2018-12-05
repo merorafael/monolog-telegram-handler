@@ -48,6 +48,7 @@ $handler = new \Mero\Monolog\Handler\TelegramHandler(
     \Monolog\Logger::DEBUG
 );
 $handler->setFormatter(new \Mero\Monolog\Formatter\HtmlFormatter());
+$handler->setTimeout(30);
 $log->pushHandler($handler);
 
 $log->debug('Message log');
@@ -55,6 +56,8 @@ $log->debug('Message log');
 
 The above example is using HtmlFormatter for Telegram API. This feature is added on 0.3.0 release and 
 you can use declaring handler formatter to use `\Mero\Monolog\Formatter\HtmlFormatter` class.
+
+You can set the timeout for Telegram request using `setTimeout` method, implemented on `TelegramHandler`. This feature is implemented on 0.4.0 release and this use is not required.
 
 Creating a bot
 --------------
