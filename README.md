@@ -20,7 +20,8 @@ Instalation with composer
 -------------------------
 
 1. Open your project directory;
-2. Run `composer require mero/telegram-handler` to add `TelegramHandler` in your project vendor.
+2. Run `composer require mero/telegram-handler` to add `TelegramHandler` in your project vendor;
+3. Add `symfony/yaml` dependency if you need use the `\Mero\Monolog\Formatter\HtmlFormatter`.
 
 Declaring handler object
 ------------------------

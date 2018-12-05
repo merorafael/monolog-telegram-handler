@@ -37,6 +37,9 @@
       "Mero\\Monolog\\": "tests/Mero/Monolog"
     }
   },
+  "suggest": {
+    "symfony/yaml": "Needed to use HtmlFormatter feature"
+  },
   "extra": {
     "branch-alias": {
       "dev-master": "0.3.x-dev"
